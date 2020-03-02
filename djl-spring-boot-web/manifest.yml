@@ -1,0 +1,9 @@
+---
+applications:
+- name: djl-demo-web
+  memory: 700M
+  env:
+    AWS_ACCESS_KEY: <<AWS_ACCESS_KEY>>
+    AWS_SECRET_KEY: <<AWS_SECRET_KEY>>
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 13.0.1_+ } }'
+    DJL_APP_URL: http://djl-demo.cfapps.io

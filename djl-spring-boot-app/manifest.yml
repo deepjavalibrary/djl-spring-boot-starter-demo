@@ -1,0 +1,9 @@
+---
+applications:
+- name: djl-demo
+  memory: 6G
+  env:
+    AWS_ACCESS_KEY: <YOUR ACCESS KEY> 
+    AWS_SECRET_KEY: <YOUR SECRET KEY> 
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 13.0.1_+ }, memory_calculator: { headroom: 50 }}'
+# headroom above is needed since the app is using JNA and allocates off heap memory

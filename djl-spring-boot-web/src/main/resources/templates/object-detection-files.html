@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>DJL Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link media="all" rel="stylesheet" type="text/css" href="/style.css"/>
+</head>
+<script>
+  function myFunction(row) {
+    var cell = row.getElementsByTagName("td")[0];
+    document.getElementById("image-view").style="display: block;"
+    document.getElementById("inbox-src").src="/object-detection/images/" + cell.innerHTML;
+    document.getElementById("outbox-src").src="/object-detection/images/outbox/" + cell.innerHTML.replace("inbox/", "") + ".png";
+    document.getElementById("response-area").value = "No API results"
+  }
+
+</script>
+<body style="padding-left: 1cm;">
+
+<div class="footer" th:unless="${#lists.isEmpty(files.objectSummaries)}">
+
+    <h2>List of Files</h2>
+
+    <table id="file-list">
+        <thead>
+        <tr>
+            <th align="left">Name</th>
+            <th align="left">Size</th>
+            <th align="left">Created</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sb : ${files.objectSummaries}" onclick="myFunction(this)" th:unless="${sb.size}==0">
+            <td id="key" th:text="${sb.key}">Object key in S3</td>
+            <td th:text="${sb.size}">File size</td>
+            <td th:text="${sb.lastModified}">Last modified</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div id="new-detection-form" style="display: block;">
+    <h2>Select File for Detection</h2>
+    <form th:object="${objectDetectionForm}" th:action="@{/object-detection/inbox}" method="post"
+          enctype="multipart/form-data">
+        <input type="file" name="file"/>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+<div id="image-view" th:style="*{originalFile != null}? 'display: block;' : 'display: none;'">
+    <textarea id="response-area" class="code" th:text="*{results}?: 'no API results'" cols="60" rows="8"/>
+    <p>
+        <img id="inbox-src"
+             th:src="@{*{originalFile == null}? '' : ${'/object-detection/images/inbox/' + originalFile}}"
+             title="Original File"
+             width="500">
+    </p>
+    <p>
+        <img id="outbox-src" th:src="@{*{resultFile == null}? '' : ${'/object-detection/images/outbox/' + resultFile}}"
+             title="Result File"
+             width="500">
+    </p>
+</div>
+
+</body>
+</html>
