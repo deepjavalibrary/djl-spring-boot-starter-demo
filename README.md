@@ -16,7 +16,7 @@ The above will detect the os on the system where the build is running and use it
 Platform specific builds (for CI): 
 
     ./gradlew :djl-spring-boot-app:bootJar -P osclassifier=linux-x86_64
-    ./gradlew :djl-spring-boot-app:bootJar -P osclassifier=mac-x86_64
+    ./gradlew :djl-spring-boot-app:bootJar -P osclassifier=osx-x86_64
     ./gradlew :djl-spring-boot-app:bootJar -P osclassifier=win-x86_64
   
 The produced artifacts will have the classifier in the name of the spring boot uber jar, e.g.
@@ -32,7 +32,7 @@ The produced artifacts will have the classifier in the name of the spring boot u
   The bucket is expected to have two prefixes: inbox (where input is located) and outbox (where results are placed)
   AWS_ACCESS_KEY and AWS_SECRET_KEY set as environment variables. IAM user is expected to have read permissions for inbox and write permission for outbox.
   
-  Mac:
+  macOS:
   
     java -jar djl-spring-boot-app/build/libs/djl-spring-boot-app-0.0.1-SNAPSHOT-osx-x86_64.jar
   
