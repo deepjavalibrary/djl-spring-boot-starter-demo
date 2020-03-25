@@ -1,10 +1,29 @@
-import org.jetbrains.kotlin.gradle.internal.Kapt3KotlinGradleSubplugin
+import java.io.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	id("org.springframework.boot")
+	id ("com.google.cloud.tools.jib") apply true
 	kotlin("jvm")
 	kotlin("plugin.spring")
+}
+
+val commitHash = Runtime
+		.getRuntime()
+		.exec("git rev-parse --short HEAD")
+		.let<Process, String> { process ->
+			process.waitFor()
+			val output = process.inputStream.use {
+				it.bufferedReader().use(BufferedReader::readText)
+			}
+			process.destroy()
+			output.trim()
+		}
+
+jib {
+	from.image = "openjdk:13"
+	to.image = "929819487611.dkr.ecr.us-east-1.amazonaws.com/djl-spring-boot-web"
+	to.tags = setOf(version.toString().plus("-").plus(commitHash))
 }
 
 dependencies {
