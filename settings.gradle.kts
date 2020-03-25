@@ -1,4 +1,4 @@
-rootProject.name = "djl-spring-boot-examples"
+rootProject.name = "djl-spring-boot-demo"
 
 include("djl-spring-boot-model")
 include("djl-spring-boot-common")

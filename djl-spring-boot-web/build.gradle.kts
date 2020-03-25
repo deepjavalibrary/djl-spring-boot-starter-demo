@@ -7,18 +7,7 @@ plugins {
 	kotlin("jvm")
 	kotlin("plugin.spring")
 }
-
-val commitHash = Runtime
-		.getRuntime()
-		.exec("git rev-parse --short HEAD")
-		.let<Process, String> { process ->
-			process.waitFor()
-			val output = process.inputStream.use {
-				it.bufferedReader().use(BufferedReader::readText)
-			}
-			process.destroy()
-			output.trim()
-		}
+val commitHash = ext.get("commitHash")
 
 jib {
 	from.image = "openjdk:13"

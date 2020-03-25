@@ -12,11 +12,13 @@ repositories {
 
 val osclassifier : String? by project
 val inferredClassifier: String = osclassifier?: osdetector.classifier
+val timestamp = System.currentTimeMillis()
+val commitHash = ext.get("commitHash")
 
 jib {
     from.image = "openjdk:13"
     to.image = "929819487611.dkr.ecr.us-east-1.amazonaws.com/djl-spring-boot-app"
-    to.tags = setOf(version.toString().plus("-").plus(inferredClassifier))
+    to.tags = setOf(version.toString().plus("-").plus(inferredClassifier).plus("-").plus(commitHash))
 }
 
 dependencies {
