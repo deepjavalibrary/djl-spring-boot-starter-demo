@@ -6,8 +6,7 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-    mavenLocal()
+    //maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
 }
 
 val osclassifier : String? by project
@@ -23,8 +22,7 @@ jib {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.0.1-SNAPSHOT")
-    implementation("net.java.dev.jna:jna:5.3.0") // required override due to conflict with spring boot
+    implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.2")
     implementation(project(":djl-spring-boot-common"))
     implementation(project(":djl-spring-boot-model"))
 

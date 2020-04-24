@@ -13,8 +13,9 @@
 package com.aws.samples.djlspringboot;
 
 import ai.djl.inference.Predictor;
-import ai.djl.modality.cv.DetectedObjects;
+
 import ai.djl.modality.cv.ImageVisualization;
+import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.TranslateException;
 import com.aws.samples.djl.spring.common.S3ImageDownloader;
 import com.aws.samples.djl.spring.common.S3ImageUploader;
