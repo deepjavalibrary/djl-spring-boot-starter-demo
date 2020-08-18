@@ -22,10 +22,10 @@ jib {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.2")
+    implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.5")
     implementation(project(":djl-spring-boot-common"))
     implementation(project(":djl-spring-boot-model"))
-
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
