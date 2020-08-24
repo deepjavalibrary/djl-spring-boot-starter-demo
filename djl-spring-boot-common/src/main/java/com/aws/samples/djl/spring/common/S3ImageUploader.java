@@ -14,8 +14,6 @@ package com.aws.samples.djl.spring.common;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

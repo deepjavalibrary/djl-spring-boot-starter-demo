@@ -6,7 +6,7 @@ plugins {
 
 repositories {
     mavenCentral()
-    //maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
 }
 
 val osclassifier : String? by project
@@ -22,7 +22,8 @@ jib {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.5")
+    // implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.6-SNAPSHOT")
+    implementation("ai.djl.spring:djl-spring-boot-starter-pytorch-auto:0.6-SNAPSHOT")
     implementation(project(":djl-spring-boot-common"))
     implementation(project(":djl-spring-boot-model"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")

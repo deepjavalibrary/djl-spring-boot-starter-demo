@@ -14,7 +14,8 @@ package com.aws.samples.djlspringboot;
 
 import ai.djl.inference.Predictor;
 
-import ai.djl.modality.cv.ImageVisualization;
+import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.translate.TranslateException;
 import com.aws.samples.djl.spring.common.S3ImageDownloader;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -42,7 +44,7 @@ public class InferencePointController {
     private static final Logger LOG = LoggerFactory.getLogger(InferencePointController.class);
 
     @Resource
-    private Supplier<Predictor<BufferedImage, DetectedObjects>> predictorSupplier;
+    private Supplier<Predictor<Image, DetectedObjects>> predictorSupplier;
 
     @Resource
 	private S3ImageUploader uploader;
@@ -55,15 +57,16 @@ public class InferencePointController {
     public InferenceResponse detect(@RequestParam(name = "file", required = true) String fileName,
                                     @RequestParam(name = "generateOutputImage") Optional<Boolean> generateOutputImage)
 			throws IOException, TranslateException {
-        BufferedImage img = downloader.download(fileName);
+
+        Image image = ImageFactory.getInstance().fromInputStream(downloader.downloadStream(fileName));
         var inferredObjects = new LinkedList<InferredObject>();
         var outputReference = "";
 
         try(var p = predictorSupplier.get()) {
-            var detected = p.predict(img);
+            var detected = p.predict(image);
             if(generateOutputImage.orElse(true)) {
-                BufferedImage newImage = createImage(detected, img);
-                outputReference = uploader.upload(newImage, fileName + ".png");
+                Image newImage = createImage(detected, image);
+                outputReference = uploader.upload((RenderedImage) newImage.getWrappedImage(), fileName + ".png");
             }
             detected.items().forEach(e -> inferredObjects.add(new InferredObject(e.getClassName(), e.getProbability())));
         }
@@ -71,13 +74,9 @@ public class InferencePointController {
         return new InferenceResponse(inferredObjects, outputReference);
     }
 
-    private static BufferedImage createImage(DetectedObjects detection, BufferedImage original) {
-		BufferedImage newImage =
-				new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g = newImage.createGraphics();
-		g.drawImage(original, 0, 0, null);
-		g.dispose();
-		ImageVisualization.drawBoundingBoxes(newImage, detection);
+    private static Image createImage(DetectedObjects detection, Image original) {
+		Image newImage = original.duplicate(Image.Type.TYPE_INT_ARGB);
+        newImage.drawBoundingBoxes(detection);
 		return newImage;
 	}
 

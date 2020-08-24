@@ -1,0 +1,14 @@
+aws:
+  s3:
+    bucket: djl-demo
+    download-folder: inbox
+    upload-folder: outbox
+logging:
+  level:
+    root: info
+    org.springframework: info
+
+
+
+
+

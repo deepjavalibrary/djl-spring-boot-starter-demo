@@ -15,6 +15,7 @@ package com.aws.samples.djlspringboot;
 import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
+import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
@@ -34,20 +35,20 @@ import java.util.function.Supplier;
 public class InferenceConfiguration {
 
     @Bean
-    public Criteria<BufferedImage, DetectedObjects> criteria() {
+    public Criteria<Image, DetectedObjects> criteria() {
         return Criteria.builder()
-                .setTypes(BufferedImage.class, DetectedObjects.class)
+                .setTypes(Image.class, DetectedObjects.class)
                 .optApplication(Application.CV.OBJECT_DETECTION)
-                .optFilter("size", "512")
-                .optFilter("backbone", "mobilenet1.0")
-                .optFilter("dataset", "voc")
+//                .optFilter("size", "512")
+//                .optFilter("backbone", "mobilenet1.0")
+//                .optFilter("dataset", "voc")
                 .optArgument("threshold", 0.1)
                 .build();
     }
 
     @Bean
-    public ZooModel<BufferedImage, DetectedObjects> model(
-            @Qualifier("criteria") Criteria<BufferedImage, DetectedObjects> criteria)
+    public ZooModel<Image, DetectedObjects> model(
+            @Qualifier("criteria") Criteria<Image, DetectedObjects> criteria)
             throws MalformedModelException, ModelNotFoundException, IOException {
         return ModelZoo.loadModel(criteria);
     }
@@ -59,7 +60,7 @@ public class InferenceConfiguration {
      */
     @Bean(destroyMethod = "close")
     @Scope(value = "prototype", proxyMode = ScopedProxyMode.INTERFACES)
-    public Predictor<BufferedImage, DetectedObjects> predictor(ZooModel<BufferedImage, DetectedObjects> model) {
+    public Predictor<Image, DetectedObjects> predictor(ZooModel<Image, DetectedObjects> model) {
         return model.newPredictor();
     }
 
@@ -69,7 +70,7 @@ public class InferenceConfiguration {
      * @return
      */
     @Bean
-    public Supplier<Predictor<BufferedImage, DetectedObjects>> predictorProvider(ZooModel<BufferedImage, DetectedObjects> model) {
+    public Supplier<Predictor<Image, DetectedObjects>> predictorProvider(ZooModel<Image, DetectedObjects> model) {
         return model::newPredictor;
     }
 }

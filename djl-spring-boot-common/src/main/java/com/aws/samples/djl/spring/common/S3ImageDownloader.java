@@ -18,8 +18,7 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -37,12 +36,6 @@ public class S3ImageDownloader {
         this.s3 = s3;
         this.bucketName = bucketName;
         this.folder = folder == null ? "" : folder.concat("/");
-    }
-
-    public BufferedImage download(String fileName) throws IOException {
-        try (InputStream s3is = downloadStream(fileName)) {
-            return ImageIO.read(s3is);
-        }
     }
 
     public InputStream downloadStream(String fileName) throws IOException {
