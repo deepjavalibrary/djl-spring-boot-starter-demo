@@ -39,9 +39,9 @@ public class InferenceConfiguration {
         return Criteria.builder()
                 .setTypes(Image.class, DetectedObjects.class)
                 .optApplication(Application.CV.OBJECT_DETECTION)
-//                .optFilter("size", "512")
-//                .optFilter("backbone", "mobilenet1.0")
-//                .optFilter("dataset", "voc")
+                .optFilter("size", "512")
+                .optFilter("backbone", "mobilenet1.0")
+                .optFilter("dataset", "voc")
                 .optArgument("threshold", 0.1)
                 .build();
     }

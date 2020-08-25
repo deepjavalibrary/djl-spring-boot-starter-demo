@@ -22,8 +22,8 @@ jib {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    // implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.6-SNAPSHOT")
-    implementation("ai.djl.spring:djl-spring-boot-starter-pytorch-auto:0.6-SNAPSHOT")
+    implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.6-SNAPSHOT")
+    //implementation("ai.djl.spring:djl-spring-boot-starter-pytorch-auto:0.6-SNAPSHOT")
     implementation(project(":djl-spring-boot-common"))
     implementation(project(":djl-spring-boot-model"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
