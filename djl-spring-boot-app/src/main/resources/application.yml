@@ -7,8 +7,12 @@ logging:
   level:
     root: info
     org.springframework: info
-
-
+  info:
+    app:
+      name: djl-spring-boot-demo-api
+      description: DJL Spring Boot Demo API
+      version: 0.0.1
+      djl-boot-starter.version: 0.6-SNAPSHOT
 
 
 
