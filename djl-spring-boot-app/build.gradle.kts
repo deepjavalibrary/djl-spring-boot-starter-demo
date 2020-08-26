@@ -13,17 +13,18 @@ val osclassifier : String? by project
 val inferredClassifier: String = osclassifier?: osdetector.classifier
 val timestamp = System.currentTimeMillis()
 val commitHash = ext.get("commitHash")
+val versionTags = generateVersionTag()
 
 jib {
-    from.image = "openjdk:13"
+    from.image = "adoptopenjdk/openjdk13:debian"
     to.image = "929819487611.dkr.ecr.us-east-1.amazonaws.com/djl-spring-boot-app"
-    to.tags = setOf(version.toString().plus("-").plus(inferredClassifier).plus("-").plus(commitHash))
+    to.tags = versionTags
 }
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.6-SNAPSHOT")
-    //implementation("ai.djl.spring:djl-spring-boot-starter-pytorch-auto:0.6-SNAPSHOT")
+    // implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.6-SNAPSHOT")
+    implementation("ai.djl.spring:djl-spring-boot-starter-pytorch-auto:0.6-SNAPSHOT")
     implementation(project(":djl-spring-boot-common"))
     implementation(project(":djl-spring-boot-model"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -32,6 +33,7 @@ dependencies {
     }
     // See: https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for MXNet library selection
 }
+
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     archiveClassifier.set(inferredClassifier)
 }
@@ -40,4 +42,8 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+fun generateVersionTag() : Set<String> {
+    project.logger.lifecycle("Version tag: ".plus(commitHash))
+    return  setOf(version.toString().plus("-").plus(inferredClassifier).plus("-").plus(commitHash))
+}
 
