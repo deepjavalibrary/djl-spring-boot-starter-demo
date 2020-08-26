@@ -42,7 +42,7 @@ public class InferenceConfiguration {
 //                .optFilter("size", "512")
 //                .optFilter("backbone", "mobilenet1.0")
 //                .optFilter("dataset", "voc")
-                .optArgument("threshold", 0.3)
+                .optArgument("threshold", 0.1)
                 .build();
     }
 
