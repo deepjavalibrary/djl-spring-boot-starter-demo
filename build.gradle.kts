@@ -27,12 +27,12 @@ subprojects {
         mavenCentral()
     }
 
-    java.sourceCompatibility=JavaVersion.VERSION_12
-    java.targetCompatibility=JavaVersion.VERSION_12
+    java.sourceCompatibility=JavaVersion.VERSION_11
+    java.targetCompatibility=JavaVersion.VERSION_11
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework:spring-framework-bom:5.2.3.RELEASE")
+            mavenBom("org.springframework:spring-framework-bom:5.2.8.RELEASE")
         }
     }
 }
