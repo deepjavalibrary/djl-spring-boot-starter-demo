@@ -28,13 +28,18 @@ The produced artifacts will have the classifier in the name of the spring boot u
  ## Running Backend
  
  At present running the app requires the following:
-  S3 bucket (djl-demo by default) specified in djl-spring-boot-app/src/main/resources/application.properties.
-  The bucket is expected to have two prefixes: inbox (where input is located) and outbox (where results are placed)
-  AWS_ACCESS_KEY and AWS_SECRET_KEY set as environment variables. IAM user is expected to have read permissions for inbox and write permission for outbox.
+  S3 bucket (`djl-demo` by default) specified in `djl-spring-boot-app/src/main/resources/application.properties`.
+  The bucket is expected to have two prefixes: `inbox` (where input is located) and `outbox` (where results are placed)
+  `AWS_ACCESS_KEY` and `AWS_SECRET_KEY` set as environment variables for region `us-east-1`. 
+  The IAM user is expected to have read permissions for `inbox` and write permission for `outbox`.
   
-  macOS:
-  
+  Run the following command to start the backend based on the created JAR file, sample command for macOS:
+      
     java -jar djl-spring-boot-app/build/libs/djl-spring-boot-app-0.0.1-SNAPSHOT-osx-x86_64.jar
+  
+  Alternatively you can use Gradle for execution, sample command for Windows:   
+  
+    gradlew :djl-spring-boot-app:bootRun -P osclassifier=win-x86_64
   
 ## Deploying to PCF
 
