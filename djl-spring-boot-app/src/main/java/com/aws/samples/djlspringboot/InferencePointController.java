@@ -13,7 +13,6 @@
 package com.aws.samples.djlspringboot;
 
 import ai.djl.inference.Predictor;
-
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
@@ -22,9 +21,7 @@ import com.aws.samples.djl.spring.common.S3ImageDownloader;
 import com.aws.samples.djl.spring.common.S3ImageUploader;
 import com.aws.samples.djl.spring.model.InferenceResponse;
 import com.aws.samples.djl.spring.model.InferredObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,13 +32,11 @@ import javax.annotation.Resource;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 @RestController
 public class InferencePointController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InferencePointController.class);
     private static final String PNG = ".png";
 
     @Resource
@@ -58,7 +53,7 @@ public class InferencePointController {
 
     @GetMapping
     @RequestMapping("/inference")
-    public InferenceResponse detect(@RequestParam(name = "file", required = true) String fileName,
+    public InferenceResponse detect(@RequestParam(name = "file") String fileName,
                                     @RequestParam(name = "generateOutputImage") Boolean generateOutputImage)
 			throws IOException, TranslateException {
 

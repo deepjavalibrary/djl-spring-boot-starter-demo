@@ -16,6 +16,7 @@ import ai.djl.Application;
 import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.cv.Image;
+import ai.djl.modality.cv.ImageFactory;
 import ai.djl.modality.cv.output.DetectedObjects;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
@@ -33,6 +34,11 @@ import java.util.function.Supplier;
 
 @Configuration
 public class InferenceConfiguration {
+
+    @Bean
+    public ImageFactory imageFactory() {
+        return ImageFactory.getInstance();
+    }
 
     @Bean
     public Criteria<Image, DetectedObjects> criteria() {
