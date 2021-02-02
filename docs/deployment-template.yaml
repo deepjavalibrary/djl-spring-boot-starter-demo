@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: djl-app
+  labels:
+    app: djl-app
+spec:
+  minReadySeconds: 5
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 60
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: djl-app
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+      labels:
+        app: djl-app
+    spec:
+      serviceAccountName: djl-backend-account
+      containers:
+        - name: djl-app
+          image: <YOUR_IMAGE-AND-TAG>
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: DJL_S3_BUCKET
+              value: <YOUR_DJL_BUCKET>
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2536Mi
+            requests:
+              cpu: 400m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: djl-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: djl-app
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080

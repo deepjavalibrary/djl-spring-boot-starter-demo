@@ -61,8 +61,8 @@ public class InferenceConfiguration {
 
     /**
      * Scoped proxy is one way to have a predictor configured and closed.
-     * @param model
-     * @return
+     * @param model object for which predictor is expected to be returned
+     * @return predictor object that can be used for inference
      */
     @Bean(destroyMethod = "close")
     @Scope(value = "prototype", proxyMode = ScopedProxyMode.INTERFACES)
@@ -72,8 +72,8 @@ public class InferenceConfiguration {
 
     /**
      * Inject with @Resource or autowired. Only safe to be used in the try with resources.
-     * @param model
-     * @return
+     * @param model object for which predictor is expected to be returned
+     * @return supplier of predictor for thread-safe inference
      */
     @Bean
     public Supplier<Predictor<Image, DetectedObjects>> predictorProvider(ZooModel<Image, DetectedObjects> model) {

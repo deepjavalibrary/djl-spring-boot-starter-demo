@@ -54,6 +54,161 @@ Check the logs:
 
     cd logs djl-demo --recent
 
+## Deploying to EKS (Amazon Elastic Kubernetes Service)
+
+The instructions in this section may be generalized for any vanilla Kubernetes cluster, however they contain EKS 
+specific features, such as IAM Roles integration for Kubernetes Service Accounts (IRSA).
+
+Deployment to EKS is implemented in such a way that credentials to access remote resources such as S3 buckets from 
+the pod are not stored anywhere on the cluster, instead we will provision a role with the right IAM policy and use 
+it instead.  
+
+We will use [`eksctl` tool](https://eksctl.io/introduction/#installation) to provision an EKS cluster for 
+demonstration purposes.
+
+Before you start, make sure you have AWS CLI installed and proper credentials to access your AWS account.
+Steps 2, 4 and 5 are only needed if you would like to protect access to your S3 bucket properly (it is NOT a good 
+idea to open up an bucket with read/write access to the world). 
+
+1. Create EKS Cluster
+    ```bash
+    eksctl create cluster --name=djl-demo --nodes=2
+    ```
+
+2. Create an OIDC Identity Provider (for IRSA)
+    ```
+    eksctl utils associate-iam-oidc-provider --cluster djl-demo --approve
+    ```
+    
+    More info: [EKS Workshop](https://www.eksworkshop.com/beginner/110_irsa/oidc-provider/)
+
+
+3. Create `djl-demo-<youraccount>` S3 bucket.  We will use two prefixes: `inbox` for incoming images and `outbox` 
+   for outgoing processed images with detected objects. 
+   The bucket name must be unique so in this example we add a suffix for your AWS account number which should 
+   replace the placeholder <YOUR_AWS_ACCOUNT>.
+       
+    ```bash
+    aws s3 mb s3://djl-demo-<YOUR_AWS_ACCOUNT>
+    ```
+    
+    Note: this will create a bucket that will require proper authorization. Objects in the bucket will not be accessible 
+    publicly.
+   
+
+4. Create IAM Policy to access the S3 bucket that you created (will be used for pods deployed in the demo):
+
+    - Create a copy of the `docs/AccesDjlBucketPolicyTemplate.json` as `AccessDjlBucketPolicy.json` **replacing 
+    <YOUR_BUCKET_NAME> with your actual bucket name**. 
+    
+    ```bash
+    aws iam create-policy --policy-name AccessDjlBucket --policy-document file://AccessDjlBucketPolicy.json
+    ```
+    
+    - You can get the ARN on of the created policy with the following command:
+    
+    ```bash
+     aws iam list-policies --query 'Policies[?PolicyName==`AccessDjlBucket`].Arn'
+    ```
+   
+5. Create a service account for the backend service: 
+   
+   **Note:** Adjust the namespace if you plan to deploy to a namespace different from default.
+   
+    ```bash
+    eksctl create iamserviceaccount \
+        --name djl-backend-account \
+        --namespace default \
+        --cluster djl-demo \
+        --attach-policy-arn <ARN_OF_POLICY_OBTAINED_IN_STEP_4> \
+        --approve \
+        --override-existing-serviceaccounts
+    ```
+
+6. In this example we will use Amazon ECR private repository to push images. The repository will need to be created 
+   upfront. 
+
+    ```bash
+    aws ecr create-repository --repository-name djl-spring-boot-app
+    ```
+
+7. Build and push the container image for the API app to an accessible container (Docker) registry.
+   
+    - You must be properly authenticated to push images to Amazon ECR. For more info see this 
+   [doc](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html).
+   
+    - Assuming you forked this repository, modify the jib section of the `djl-spring-boot-app/build.gradle.kts` to 
+    reflect your settings (replace the placeholders):
+    ```kotlin
+    jib {
+        from.image = "adoptopenjdk/openjdk13:debian"
+        to.image = "<YOUR_AWS_ACCOUNT>.dkr.ecr.<YOUR_REGION>.amazonaws.com/djl-spring-boot-app"
+        to.tags = versionTags
+    } 
+    ```
+
+    - From the root directory:
+    ```bash
+    ./gradlew djl-spring-boot-app:bootjar
+    ./gradlew djl-spring-boot-app:jib
+    ```
+
+    The above will push the image to the Amazon ECR container registry and output the image/tag pair that you will need 
+    for the subsequent steps.
+
+
+8. Deploy the application:
+    
+    - Modify the provided `docs/deployment-template.yaml` and specify your image:tag produced in step 7 
+
+    - Run the command below to deploy the application and create a load balancer to access it over HTTP (don't use this 
+   approach in production without TLS in place):
+   
+    ```bash
+    # assuming you saved the modified deployment-template.yml in the current directory as deployment.yml
+    kublectl apply -f deployment.yml
+    ``` 
+   
+    You can set the `-n YOUR_NAMESPACE` flag on the command if you created the service account in a different namespace.
+
+    **Note:** this deployment is leveraging the service account `djl-backend-account` created in the previous steps. If you 
+    don't need a service account (e.g. in case you modified the app to read from local storage), then remove the  
+   service account association in the template (`serviceAccountName: djl-backend-account`).
+
+
+9. Test your api:
+   
+   - Get the load balancer public DNS name by listing the created service
+   
+    ```bash
+    # ensure the pod is in running state
+    kubectl get po 
+    # get the loadbalancer URL
+    kubectl get svc djl-app
+    ```
+ 
+   - Upload a file to your S3 bucket
+   
+    ```bash
+        aws s3 cp some-file.png s3://<YOUR_BUCKET_NAME>/inbox/some-file.jpg
+    ```
+
+    - Test with curl
+    ```bash
+        curl -v "http://<YOUR_LOAD_BALANCER_DNS>/inference?file=some-file.jpg&generateOutputImage=true"
+    ```
+
+    - Get the output file (at present .png extension is always appended)
+    
+    ```bash
+        aws s3 cp s3://<YOUR_BUCKET_NAME>/outbox/some-file.jpg.png
+    ```
+
+This completes the EKS deployment portion of the application.
+
+The EKS deployment of the API can be modified to scale up and down based on demand and spin up pods as needed based 
+on HPA. The recommended approach to deploy any workloads on EKS is to use GipOps approach such as [FluxCD](https://fluxcd.io/) or [ArgoCD](https://argoproj.github.io/argo-cd/).
+
 ## Frontend Web Application
 [Web Application](djl-spring-boot-web/README.md)
 
