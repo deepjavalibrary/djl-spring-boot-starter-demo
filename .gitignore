@@ -5,6 +5,10 @@ build/
 !**/src/main/**
 !**/src/test/**
 
+AccessDjlBucketPolicy.json
+deployment.yaml
+kitten.jpg
+
 ### STS ###
 .apt_generated
 .classpath
