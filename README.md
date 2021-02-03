@@ -65,6 +65,8 @@ it instead.
 
 We will use [`eksctl` tool](https://eksctl.io/introduction/#installation) to provision an EKS cluster for 
 demonstration purposes.
+You also need to install [kubectl](https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html) – A
+command line tool for working with Kubernetes clusters.
 
 Before you start, make sure you have AWS CLI installed and proper credentials to access your AWS account.
 Steps 2, 4 and 5 are only needed if you would like to protect access to your S3 bucket properly (it is NOT a good 
@@ -102,6 +104,8 @@ idea to open up an bucket with read/write access to the world).
     <YOUR_BUCKET_NAME> with your actual bucket name**. 
     
     ```bash
+    cp docs/AccessDjlBucketPolicyTemplate.json AccessDjlBucketPolicy.json
+    # edit your AccessDjlBucketPolicy.json file
     aws iam create-policy --policy-name AccessDjlBucket --policy-document file://AccessDjlBucketPolicy.json
     ```
     
@@ -134,11 +138,16 @@ idea to open up an bucket with read/write access to the world).
 
 7. Build and push the container image for the API app to an accessible container (Docker) registry.
    
-    - You must be properly authenticated to push images to Amazon ECR. For more info see this 
-   [doc](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html).
+    - You must be properly authenticated to push images to Amazon ECR. For more info see this
+      [doc](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html).
+      
+   ```bash
+   aws ecr get-login-password --region <YOUR_REGION> | docker login --username AWS --password-stdin <YOUR_AWS_ACCOUNT>.dkr.ecr.<YOUR_REGION>.amazonaws.com
+   ```
    
     - Assuming you forked this repository, modify the jib section of the `djl-spring-boot-app/build.gradle.kts` to 
     reflect your settings (replace the placeholders):
+
     ```kotlin
     jib {
         from.image = "adoptopenjdk/openjdk13:debian"
@@ -148,6 +157,7 @@ idea to open up an bucket with read/write access to the world).
     ```
 
     - From the root directory:
+
     ```bash
     ./gradlew djl-spring-boot-app:bootjar
     ./gradlew djl-spring-boot-app:jib
@@ -165,8 +175,8 @@ idea to open up an bucket with read/write access to the world).
    approach in production without TLS in place):
    
     ```bash
-    # assuming you saved the modified deployment-template.yml in the current directory as deployment.yml
-    kublectl apply -f deployment.yml
+    # assuming you saved the modified deployment-template.yaml in the current directory as deployment.yaml
+    kubectl apply -f deployment.yaml
     ``` 
    
     You can set the `-n YOUR_NAMESPACE` flag on the command if you created the service account in a different namespace.
@@ -187,21 +197,23 @@ idea to open up an bucket with read/write access to the world).
     kubectl get svc djl-app
     ```
  
-   - Upload a file to your S3 bucket
+   - Upload a file to your S3 bucket `inbox` folder
    
     ```bash
-        aws s3 cp some-file.png s3://<YOUR_BUCKET_NAME>/inbox/some-file.jpg
+        curl -O https://resources.djl.ai/images/kitten.jpg
+        aws s3 cp kitten.jpg s3://<YOUR_BUCKET_NAME>/inbox/kitten.jpg
     ```
 
     - Test with curl
     ```bash
-        curl -v "http://<YOUR_LOAD_BALANCER_DNS>/inference?file=some-file.jpg&generateOutputImage=true"
+        curl -v "http://<YOUR_LOAD_BALANCER_DNS>/inference?file=kitten.jpg&generateOutputImage=true"
     ```
 
-    - Get the output file (at present .png extension is always appended)
+    - Get the output file from s3 `outbox` folder (**at present .png extension is always appended**)
     
     ```bash
-        aws s3 cp s3://<YOUR_BUCKET_NAME>/outbox/some-file.jpg.png
+        aws s3 ls s3://<YOUR_BUCKET_NAME>/outbox/
+        aws s3 cp s3://<YOUR_BUCKET_NAME>/outbox/kitten.jpg.png
     ```
 
 This completes the EKS deployment portion of the application.
