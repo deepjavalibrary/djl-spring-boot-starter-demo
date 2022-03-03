@@ -74,7 +74,7 @@ public class InferencePointController {
     }
 
     private static RenderedImage createImage(DetectedObjects detection, Image original) {
-		Image newImage = original.duplicate(Image.Type.TYPE_INT_ARGB);
+        Image newImage = original.duplicate();
         newImage.drawBoundingBoxes(detection);
 		return (RenderedImage) newImage.getWrappedImage();
 	}
