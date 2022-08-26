@@ -2,7 +2,7 @@ import java.io.*;
 
 plugins {
     java
-    id("org.springframework.boot") version "2.6.4" apply false
+    id("org.springframework.boot") version "2.7.3" apply false
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id ("com.google.cloud.tools.jib") version "3.1.1" apply false
     kotlin("jvm") version "1.5.20" apply false
@@ -32,7 +32,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework:spring-framework-bom:5.3.16")
+            mavenBom("org.springframework:spring-framework-bom:5.3.22")
         }
     }
 }
