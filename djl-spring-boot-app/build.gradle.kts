@@ -24,14 +24,14 @@ jib {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     //implementation("ai.djl.spring:djl-spring-boot-starter-mxnet-${inferredClassifier}:0.11-SNAPSHOT")
-    implementation("ai.djl.spring:djl-spring-boot-starter-pytorch-auto:0.18")
+    implementation("ai.djl.spring:djl-spring-boot-starter-pytorch-auto:0.19")
     implementation(project(":djl-spring-boot-common"))
     implementation(project(":djl-spring-boot-model"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
-    // See: https://github.com/awslabs/djl/blob/master/mxnet/mxnet-engine/README.md for MXNet library selection
+    // See: https://github.com/deepjavalibrary/djl/blob/master/engines/mxnet/mxnet-engine/README.md for MXNet library selection
 }
 
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
