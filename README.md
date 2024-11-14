@@ -43,7 +43,7 @@ Running the app requires the following:
   
 ## Deploying to PCF
 
-Make sure your manifest.yml file contains valid S3 access credentials. You can specify your own bucket in [application.properties] (djl-spring-boot-app/src/main/resources/application.properties) and [web application.properties](djl-spring-boot-web/src/main/resources/application.properties). 
+Make sure your manifest.yml file contains valid S3 access credentials. You can specify your own bucket in [application.properties](djl-spring-boot-app/src/main/resources/application.properties) and [web application.properties](djl-spring-boot-web/src/main/resources/application.properties). 
 
 Use the following command to deploy:
 
